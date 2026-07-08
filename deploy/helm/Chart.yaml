@@ -1,0 +1,19 @@
+apiVersion: v2
+name: hermes
+description: Hermes — 基于 Zeus 服务治理的 K8s Ingress 控制器（全栈 Go + 治理内建）
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://github.com/go-ingress/ingress
+sources:
+  - https://github.com/go-ingress/ingress
+keywords:
+  - ingress
+  - kubernetes
+  - gateway
+  - zeus
+maintainers:
+  - name: go-ingress
+icon: https://raw.githubusercontent.com/go-ingress/ingress/main/docs/assets/logo.png
+annotations:
+  artifacthub.io/license: MIT

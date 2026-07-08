@@ -1,0 +1,30 @@
+# HTTPProxy CRD 示例（高级路由：流量拆分 + 路径重写）
+# 前置：安装 CRD + 启用 --enable-httpproxy
+#   kubectl apply -f deploy/crd/httpproxy.yaml
+#   hermes --enable-httpproxy ...
+---
+apiVersion: hermes.io/v1alpha1
+kind: HTTPProxy
+metadata:
+  name: echo
+spec:
+  host: echo.example.com
+  routes:
+    - conditions:
+        - path: /api
+          prefix: true            # Prefix 匹配（false=Exact）
+      services:
+        - name: echo              # 主后端
+          port: 80
+          weight: 90
+        - name: echo-canary       # 第二个后端 → canary（weight 流量拆分）
+          port: 80
+          weight: 10
+      rewrite:
+        prefix: /v2               # /api/users → /v2/users
+    - conditions:
+        - path: /health
+          prefix: false           # Exact 匹配
+      services:
+        - name: echo
+          port: 80

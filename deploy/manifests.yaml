@@ -1,0 +1,142 @@
+# Hermes 一体化部署清单（开发/试用，生产建议用 Helm chart）
+# 用法：kubectl apply -f deploy/manifests.yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hermes-system
+  labels:
+    app.kubernetes.io/name: hermes
+    app.kubernetes.io/part-of: hermes
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: hermes-system
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+rules:
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses", "ingressclasses"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["services", "endpoints", "secrets", "configmaps", "pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  # Gateway API（CRD 未安装时无害）
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gateways", "httproutes", "tlsroutes"]
+    verbs: ["get", "list", "watch"]
+  # Hermes HTTPProxy CRD
+  - apiGroups: ["hermes.io"]
+    resources: ["httpproxies"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hermes
+subjects:
+  - kind: ServiceAccount
+    namespace: hermes-system
+    name: hermes
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "false"
+spec:
+  controller: hermes.io/ingress-controller
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: hermes-system
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hermes
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hermes
+    spec:
+      serviceAccountName: hermes
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: hermes
+          image: ghcr.io/go-ingress/hermes:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --addr=:8080
+            - --ingress-class=hermes
+            - --metrics-addr=:8081
+            - --status-hostname=hermes.example.com
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: metrics
+              containerPort: 8081
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: hermes-system
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: hermes
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

@@ -1,0 +1,64 @@
+# Hermes Helm chart 默认值
+# 用法：helm install hermes deploy/helm -n hermes-system --create-namespace
+
+# 镜像
+image:
+  repository: ghcr.io/go-ingress/hermes
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# 副本数（多副本需开启 controller.leaderElect）
+replicaCount: 1
+
+# 控制器配置
+controller:
+  ingressClass: hermes
+  watchNamespace: ""              # 空=全命名空间
+  statusHostname: hermes.example.com
+  statusAddress: ""
+  metricsAddr: ":8081"
+  enableGatewayAPI: false         # 启用 Gateway API（HTTPRoute）翻译
+  enableHTTPProxy: false          # 启用 Hermes HTTPProxy CRD 翻译
+  leaderElect: false              # 多副本 HA 必备（replicaCount>1 时建议开启）
+
+# 数据面
+dataplane:
+  addr: ":8080"
+  httpsAddr: ""                   # 留空则不启 HTTPS
+
+# 服务暴露
+service:
+  type: LoadBalancer               # LoadBalancer | NodePort | ClusterIP
+  annotations: {}
+  ports:
+    http: 80
+    https: 443
+
+# IngressClass 资源
+ingressClass:
+  create: true
+  name: hermes
+  isDefaultClass: false
+
+# PodDisruptionBudget
+podDisruptionBudget:
+  enabled: false                  # replicaCount>1 时建议开启
+  minAvailable: 1
+
+# 资源
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# 节点选择/亲和
+nodeSelector: {}
+affinity: {}
+tolerations: []
+
+# 额外 pod 标注
+podAnnotations: {}
+podLabels: {}

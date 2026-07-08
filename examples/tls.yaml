@@ -1,0 +1,25 @@
+# TLS Ingress 示例（SNI 多证书，Secret 热加载）
+# 前置：用 kubectl create secret tls 生成证书 Secret
+#   kubectl create secret tls echo-tls \
+#     --cert=echo.crt --key=echo.key
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo-tls
+spec:
+  ingressClassName: hermes
+  tls:
+    - hosts: [ echo.example.com ]
+      secretName: echo-tls
+  rules:
+    - host: echo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: echo, port: { number: 80 } }
+# Hermes 从 Ingress spec.tls 引用 Secret，加载 tls.crt/tls.key，
+# 按 SNI 动态返回证书（tls.Config.GetCertificate），Secret 轮转无需重启。
+# 启用 HTTPS：部署时设置 dataplane.httpsAddr（Helm）或 --addr=:8443 + 配置 CertPool。

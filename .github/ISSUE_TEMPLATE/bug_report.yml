@@ -1,0 +1,39 @@
+name: Bug 报告
+description: 报告 Hermes 的 bug
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 感谢反馈！请尽量填写完整以便复现。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象
+      description: 发生了什么？期望是什么？
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Hermes 版本
+      placeholder: "0.1.0 / commit hash"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: K8s 版本 / 集群类型 / Hermes 部署方式
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 错误信息
+      render: shell

@@ -1,0 +1,40 @@
+# 金丝雀发布示例：30% 流量到 canary
+# 主 Ingress + canary Ingress 同 host+path，canary 用 annotation 标记
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo
+spec:
+  ingressClassName: hermes
+  rules:
+    - host: echo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: echo, port: { number: 80 } }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo-canary
+  annotations:
+    hermes.ingress.kubernetes.io/canary: "true"
+    hermes.ingress.kubernetes.io/canary-weight: "30"
+spec:
+  ingressClassName: hermes
+  rules:
+    - host: echo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: echo-canary, port: { number: 80 } }
+# 其他决策方式（任选其一，优先级 header > cookie > weight）：
+#   hermes.ingress.kubernetes.io/canary-by-header: "X-Canary"          # header=always/never
+#   hermes.ingress.kubernetes.io/canary-by-header: "X-Region"
+#   hermes.ingress.kubernetes.io/canary-by-header-value: "us-east"     # X-Region: us-east 走 canary
+#   hermes.ingress.kubernetes.io/canary-by-cookie: "canary"            # cookie canary=true 走 canary

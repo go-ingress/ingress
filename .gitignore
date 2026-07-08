@@ -1,0 +1,38 @@
+# Go
+/idea
+*.exe
+*.test
+*.out
+*.prof
+coverage.out
+vendor/
+
+# 本地 workspace（如启用）
+go.work
+go.work.sum
+
+# OS
+.DS_Store
+
+# 构建产物 / 本地二进制（不入库）
+deploy/hermes
+hermes
+hermes.exe
+
+# 集群迁移临时备份（不入库）
+deploy/backup/
+
+# 编辑器
+.vscode/
+.idea/
+
+# docs-site（VitePress）构建产物
+docs-site/node_modules/
+docs-site/.vitepress/cache/
+docs-site/.vitepress/dist/
+
+# CI 构建产物
+/bin/
+
+# 临时备份
+*.bak

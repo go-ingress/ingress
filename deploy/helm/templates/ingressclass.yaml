@@ -1,0 +1,12 @@
+{{- if .Values.ingressClass.create }}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: {{ .Values.ingressClass.name }}
+  labels:
+    {{- include "hermes.labels" . | nindent 4 }}
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: {{ .Values.ingressClass.isDefaultClass | quote }}
+spec:
+  controller: hermes.io/ingress-controller
+{{- end }}

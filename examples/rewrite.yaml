@@ -1,0 +1,24 @@
+# 路径重写示例：/api/* → 后端收到 /*
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo-rewrite
+  annotations:
+    hermes.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: hermes
+  rules:
+    - host: echo.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: { name: echo, port: { number: 80 } }
+# 请求 /api/users → 后端收到 /（前缀 /api 被替换为 /）
+# 请求 /api → 后端收到 /
+#
+# 部分重写示例（/api/* → /v2/*）：
+#   hermes.ingress.kubernetes.io/rewrite-target: /v2
+#   请求 /api/users → 后端收到 /v2/users
