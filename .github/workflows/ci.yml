@@ -28,6 +28,10 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
+          # 用 goinstall 模式：以上一步 setup-go 装的 go 1.26 从源码编译 golangci-lint，
+          # 避免预编译二进制（go 1.24 构建）无法分析 go 1.26 目标的报错：
+          # "Go language version (go1.24) used to build golangci-lint is lower than the targeted Go version (1.26.0)"
+          install-mode: goinstall
           args: --timeout=5m
 
       - name: Go vet
