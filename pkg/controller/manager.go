@@ -47,7 +47,7 @@ func NewManager(opts ManagerOptions, sink TableSink, disc *discovery.K8sDiscover
 		return nil, err
 	}
 	// Gateway API 类型注册（CRD 未安装时无害，List 返回 NoKindMatch 被 Reconcile 忽略）。
-	_ = gatewayv1.AddToScheme(scheme)
+	_ = gatewayv1.Install(scheme) // AddToScheme 已弃用，改用 Install
 	// Hermes HTTPProxy CRD 类型注册。
 	_ = v1alpha1.AddToScheme(scheme)
 

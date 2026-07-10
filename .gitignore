@@ -14,10 +14,11 @@ go.work.sum
 # OS
 .DS_Store
 
-# 构建产物 / 本地二进制（不入库）
-deploy/hermes
-hermes
-hermes.exe
+# 构建产物 / 本地二进制（不入库）。
+# 注意：必须前导 / 锚定到仓库根，否则裸 `hermes` 会误伤 cmd/hermes/、pkg/apis/hermes/ 源码目录。
+/deploy/hermes
+/hermes
+/hermes.exe
 
 # 集群迁移临时备份（不入库）
 deploy/backup/

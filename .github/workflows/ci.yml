@@ -25,14 +25,12 @@ jobs:
         run: go mod download
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          # 用 goinstall 模式：以上一步 setup-go 装的 go 1.26 从源码编译 golangci-lint，
-          # 避免预编译二进制（go 1.24 构建）无法分析 go 1.26 目标的报错：
-          # "Go language version (go1.24) used to build golangci-lint is lower than the targeted Go version (1.26.0)"
-          install-mode: goinstall
-          args: --timeout=5m
+        # 用 setup-go 装的 go 1.26 直接安装 golangci-lint v2（v2 用 go1.26 构建，原生支持 go 1.26 目标）。
+        # 不用 action@v6：它装 v1.x，v1 的分析器在 go 1.26 下报 "no export data"。
+        # 不用 install-mode:goinstall：v1 latest 源码同样有 buildir 加载问题。锁定 v2.12.2（本地验证 0 issues）。
+        run: |
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+          golangci-lint run --timeout=5m
 
       - name: Go vet
         run: go vet ./...

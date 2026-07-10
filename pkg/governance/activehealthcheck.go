@@ -117,6 +117,6 @@ func (a *ActiveHealthCheck) probe(ctx context.Context, ins *ztypes.Instance, pat
 		a.passive.ReportHealth(key, false)
 		return
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 	a.passive.ReportHealth(key, resp.StatusCode >= 200 && resp.StatusCode < 300)
 }

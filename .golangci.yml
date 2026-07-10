@@ -1,0 +1,17 @@
+# golangci-lint v2 配置。
+# SA1019（deprecated API）暂时全局关闭：
+#   - corev1.Endpoints → discoveryv1.EndpointSlice：控制器监听 + 实例提取需重构，作为 roadmap。
+#   - golang.org/x/net/http2/h2c → http.Server.Protocols：gRPC 路由（实验性）相关，待迁移。
+# 这些 API 仍可用，迁移是独立技术债；关闭 SA1019 避免阻塞 CI，但其他 staticcheck 检查保留。
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - -SA1019

@@ -2,6 +2,7 @@
 //
 // 与 Ingress 翻译共用 model.RoutingTable，数据面无感知差异（DRY）。
 // 控制面在 --enable-gateway-api 开启时 List HTTPRoute，merge 到主路由表。
+
 package translator
 
 import (
