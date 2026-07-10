@@ -1,7 +1,7 @@
 # Hermes
 
 [![CI](https://github.com/go-ingress/ingress/actions/workflows/ci.yml/badge.svg)](https://github.com/go-ingress/ingress/actions/workflows/ci.yml)
-[![Go Version](https://img.shields.io/badge/go-1.22+-00ADD8?logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/go-1.26+-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/github/license/go-ingress/ingress?color=blue)](./LICENSE)
 [![Security Policy](https://img.shields.io/badge/security-policy-blue)](./SECURITY.md)
 

@@ -12,7 +12,7 @@
 
 ## 代码规范
 
-- **Go 版本**：1.22+（主仓 `go.mod` 下限；开发用 1.26 workspace）。
+- **Go 版本**：1.26.0+（`controller-runtime v0.24.1` / `k8s.io v0.36` 强制要求 go >= 1.26.0，`go mod tidy` 会拒绝更低版本）。本地装 go 1.26 即可，无需额外配置——`go build` 会按需自动拉取工具链。
 - **注释语言**：与现有代码保持一致（**中文注释**），与 zeus 体系对齐。
 - **零依赖原则**：核心包（`pkg/model`、`pkg/dataplane`、`pkg/translator`、`pkg/governance`、`pkg/discovery`、`pkg/controller`）尽量保持依赖精简；K8s 客户端仅在 `pkg/controller` 与 `pkg/translator` 必要时引入。
 - **接口优先**：功能域定义接口 + 实现，构造器注入（参考 zeus 模式）。

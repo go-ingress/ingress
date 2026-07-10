@@ -19,6 +19,11 @@
 ### Changed
 - **主动健康检查改为 opt-in**：仅当 Service 声明 `hermes.ingress.kubernetes.io/active-health-check-path` 时才主动探测，未声明的后端只依赖被动健康检查。
 - **修复主动健康检查误剔除后端**：此前对所有后端无条件探测 `/health`，未实现该端点的后端（静态站点等）被判不健康并剔除，导致 503。现在由 Service 注解显式开启，根除此误判（新增守护测试 `TestActiveHealthCheck_NotOptInSkipsProbing`）。
+- **go.mod 移除本地 replace**：`github.com/go-zeus/zeus` 改用公开伪版本 `v0.1.1-0.20260705221905-5744b251aa74`（从 GitHub 解析），删除 `=> ../../go-zeus/zeus` 本地路径——任何人 clone 即可构建，无需本地有 zeus 源码。
+- **Go 版本要求**：1.26.0+（`controller-runtime v0.24.1` / `k8s.io v0.36` 强制；`go mod tidy` 拒绝更低版本）。README 徽章与 CONTRIBUTING 已同步。
+
+### Fixed
+- **CI golangci-lint**：预编译 linter 二进制由 go 1.24 构建，无法分析 go 1.26 目标。改用 `install-mode: goinstall`，以 setup-go 装的 go 1.26 从源码编译 golangci-lint。
 
 ### Docs
 - 新增 [路由指南](docs-site/routing.md)：暴露服务的实战场景（前后端分离 / 多域名 / 通配 host / 默认后端 / 命名端口 / TLS / 排错速查）。
