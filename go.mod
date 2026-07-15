@@ -6,8 +6,8 @@ require (
 	github.com/go-zeus/zeus v0.1.1-0.20260705221905-5744b251aa74
 	github.com/prometheus/client_golang v1.23.2
 	golang.org/x/net v0.55.0
-	k8s.io/api v0.36.1
-	k8s.io/apimachinery v0.36.1
+	k8s.io/api v0.36.2
+	k8s.io/apimachinery v0.36.2
 	k8s.io/client-go v0.36.1
 	sigs.k8s.io/controller-runtime v0.24.1
 	sigs.k8s.io/gateway-api v1.6.0
