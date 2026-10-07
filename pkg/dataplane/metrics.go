@@ -1,6 +1,9 @@
 package dataplane
 
 import (
+	"bufio"
+	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -37,6 +40,27 @@ type statusRecorder struct {
 func (r *statusRecorder) WriteHeader(code int) {
 	r.status = code
 	r.ResponseWriter.WriteHeader(code)
+}
+
+// Flush 实现 http.Flusher，委托底层 ResponseWriter。
+// 缺失会导致代理的 w.(http.Flusher) 断言失败，SSE 流式响应被全量缓冲。
+func (r *statusRecorder) Flush() {
+	if f, ok := r.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+// Hijack 实现 http.Hijacker，委托底层 ResponseWriter。
+// 缺失会导致代理的 w.(http.Hijacker) 断言失败，WebSocket 升级被拒
+//（proxy: hijack not supported）。hijack 后响应不经 WriteHeader，
+// metrics 对该请求记初始值 200（连接时长计入 duration，与 nginx 的
+// WS 记账口径一致）。
+func (r *statusRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	hj, ok := r.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, fmt.Errorf("metrics: inner ResponseWriter %T does not implement http.Hijacker", r.ResponseWriter)
+	}
+	return hj.Hijack()
 }
 
 // metricsMiddleware 记录请求 metrics（状态码 + 延迟 + 上游失败）。
